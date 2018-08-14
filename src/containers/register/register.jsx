@@ -3,9 +3,11 @@
  */
 import React, {Component} from 'react'
 import {NavBar,List,WingBlank,WhiteSpace,InputItem,Radio,Button}from'antd-mobile'
+import {connect}from'react-redux'
 
+import {register} from "../../redux/actions";
 import Logo from '../../components/logo/logo'
-
+import {reqRegister} from "../../api";
 
 
 export default class Register extends Component {
@@ -16,14 +18,17 @@ export default class Register extends Component {
         type:'dashen'
     };
 
+
     //跳转登陆
     toLogin = ()=>{
         this.props.history.replace('/login')
     };
-    //请求登陆
-    register = ()=>{
-        console.log(this.state);
-    };
+    //请求注册
+    register = () => {
+        console.log(this.state)
+        this.props.register(this.state)
+    }
+
     //更新状态
     handleChange = (name,val)=>{
         this.setState({
@@ -33,7 +38,12 @@ export default class Register extends Component {
 
 
     render() {
-        const {type}=this.state;
+        const {type} = this.state
+        const {msg, redirectTo} = this.props.user
+        // 判断是否需要自动跳转
+        if(redirectTo) {
+            return <Redirect to={redirectTo}/>  // 在render()中实现自动跳转指定路由
+        }
         return (
             <div>
                 <NavBar>用户注册</NavBar>
@@ -64,3 +74,15 @@ export default class Register extends Component {
         )
     }
 }
+export default connect(
+    state => ({user: state.user}),  // 向UI组件Register中传入哪些一般属性
+    {register} // 向UI组件Register中传入哪些函数属性
+    // 传给UI组件不是异步action函数本身, 而是包含分发异步action的一个新的函数
+)(Register)
+
+/*
+函数属性:
+  function (user) {
+    distpatch(register(user))
+  }
+ */
